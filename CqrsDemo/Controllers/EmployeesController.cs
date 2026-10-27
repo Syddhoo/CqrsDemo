@@ -1,6 +1,8 @@
-﻿using CqrsDemo.Features.Employees.Commands;
+﻿
+using AutoMapper;
+using CqrsDemo.DTOs;
+using CqrsDemo.Features.Employees.Commands;
 using CqrsDemo.Features.Employees.Queries;
-using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +14,12 @@ namespace CqrsDemo.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly ISender _sender;
+        private readonly IMapper _mapper;
 
-        public EmployeesController(ISender sender)
+        public EmployeesController(ISender sender, IMapper mapper)
         {
             _sender = sender;
+            _mapper = mapper;
         }
 
         [HttpPost]
@@ -23,30 +27,16 @@ namespace CqrsDemo.Controllers
             CreateEmployeeCommand command,
             CancellationToken cancellationToken)
         {
-            try
-            {
-                var id = await _sender.Send(command, cancellationToken);
+            var id = await _sender.Send(command, cancellationToken);
 
-                return CreatedAtAction(
-                    nameof(GetById),
-                    new { id },
-                    new
-                    {
-                        Id = id,
-                        Message = "Employee created successfully."
-                    });
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id },
+                new
                 {
-                    Errors = ex.Errors.Select(error => new
-                    {
-                        Field = error.PropertyName,
-                        Message = error.ErrorMessage
-                    })
+                    Id = id,
+                    Message = "Employee created successfully."
                 });
-            }
         }
 
         [HttpGet]
@@ -57,7 +47,9 @@ namespace CqrsDemo.Controllers
                 new GetAllEmployeesQuery(),
                 cancellationToken);
 
-            return Ok(employees);
+            var response = _mapper.Map<List<EmployeeResponseDto>>(employees);
+
+            return Ok(response);
         }
 
         [HttpGet("{id:int}")]
@@ -74,7 +66,9 @@ namespace CqrsDemo.Controllers
                 return NotFound();
             }
 
-            return Ok(employee);
+            var response = _mapper.Map<EmployeeResponseDto>(employee);
+
+            return Ok(response);
         }
     }
 }

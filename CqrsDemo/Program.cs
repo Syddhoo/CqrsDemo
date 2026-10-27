@@ -3,6 +3,8 @@ using CqrsDemo.Data;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using CqrsDemo.Middleware;
+using CqrsDemo.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +32,13 @@ builder.Services.AddTransient(
     typeof(IPipelineBehavior<,>),
     typeof(ValidationBehavior<,>));
 
+builder.Services.AddAutoMapper(
+    cfg => { },
+    typeof(EmployeeMappingProfile).Assembly);
+
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
