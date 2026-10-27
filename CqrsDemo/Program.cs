@@ -41,6 +41,10 @@ builder.Services.AddSingleton<
     IApplicationInstanceService,
     ApplicationInstanceService>();
 
+builder.Services.AddTransient<
+    ITransientOperationService,
+    TransientOperationService>();
+
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

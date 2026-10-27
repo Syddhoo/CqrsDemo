@@ -16,13 +16,15 @@ namespace CqrsDemo.Controllers
     {
         private readonly ISender _sender;
         private readonly IMapper _mapper;
-        private readonly IApplicationInstanceService _instanceService;
+        private readonly IApplicationInstanceService _singletonService;
+        private readonly ITransientOperationService _transientService;
 
-        public EmployeesController(ISender sender, IMapper mapper, IApplicationInstanceService instanceService)
+        public EmployeesController(ISender sender, IMapper mapper, IApplicationInstanceService singletonService, ITransientOperationService transientService)
         {
             _sender = sender;
             _mapper = mapper;
-            _instanceService = instanceService;
+            _singletonService = singletonService;
+            _transientService = transientService;
         }
 
         [HttpPost]
@@ -79,7 +81,8 @@ namespace CqrsDemo.Controllers
         {
             return Ok(new
             {
-                ApplicationInstanceId = _instanceService.InstanceId
+                InstanceSingleton = _singletonService.InstanceId,
+                InstanceTransient = _transientService.InstanceId
             });
         }
     }
