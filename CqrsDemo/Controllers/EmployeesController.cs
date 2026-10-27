@@ -3,6 +3,7 @@ using AutoMapper;
 using CqrsDemo.DTOs;
 using CqrsDemo.Features.Employees.Commands;
 using CqrsDemo.Features.Employees.Queries;
+using CqrsDemo.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,11 +16,13 @@ namespace CqrsDemo.Controllers
     {
         private readonly ISender _sender;
         private readonly IMapper _mapper;
+        private readonly IApplicationInstanceService _instanceService;
 
-        public EmployeesController(ISender sender, IMapper mapper)
+        public EmployeesController(ISender sender, IMapper mapper, IApplicationInstanceService instanceService)
         {
             _sender = sender;
             _mapper = mapper;
+            _instanceService = instanceService;
         }
 
         [HttpPost]
@@ -69,6 +72,15 @@ namespace CqrsDemo.Controllers
             var response = _mapper.Map<EmployeeResponseDto>(employee);
 
             return Ok(response);
+        }
+
+        [HttpGet("instance")]
+        public IActionResult GetApplicationInstance()
+        {
+            return Ok(new
+            {
+                ApplicationInstanceId = _instanceService.InstanceId
+            });
         }
     }
 }

@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using CqrsDemo.Middleware;
 using CqrsDemo.Mappings;
+using CqrsDemo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,10 @@ builder.Services.AddTransient(
 builder.Services.AddAutoMapper(
     cfg => { },
     typeof(EmployeeMappingProfile).Assembly);
+
+builder.Services.AddSingleton<
+    IApplicationInstanceService,
+    ApplicationInstanceService>();
 
 var app = builder.Build();
 
